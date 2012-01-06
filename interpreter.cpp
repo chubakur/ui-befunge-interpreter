@@ -65,9 +65,11 @@ private:
 			else if(command>='0' and command<='9') stack.push(command - '0');
 			else if(command=='"') symbol_mode = !symbol_mode;
 			else if(command==','){
-				char s = stack.top();
-				if(static_cast<int>(s)<=9) printf("%d",static_cast<int>(s));
-				else printf("%c",stack.top());
+				printf("%c",stack.top());
+				stack.pop();
+			}
+			else if(command=='.'){
+				printf("%d",static_cast<int>(stack.top()));
 				stack.pop();
 			}
 		}else{
