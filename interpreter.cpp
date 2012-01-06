@@ -62,10 +62,12 @@ private:
 				stack.pop();
 				stack.push(matrix[xi+yi*size_x]);
 			}
-			else if(command>='0' and command<='9') stack.push(command);
+			else if(command>='0' and command<='9') stack.push(command - '0');
 			else if(command=='"') symbol_mode = !symbol_mode;
 			else if(command==','){
-				printf("%c",stack.top());
+				char s = stack.top();
+				if(static_cast<int>(s)<=9) printf("%d",static_cast<int>(s));
+				else printf("%c",stack.top());
 				stack.pop();
 			}
 		}else{
@@ -113,12 +115,10 @@ public:
 		size_x = max_x;
 		printf("Analyzing.\nSize of matrix: %dx%d\n",size_x,size_y);
 		//Создаем матрицу
-		printf("Generate matrix %dx%d\n",size_x,size_y);
 		matrix = new char[size_x*size_y];
 		for(int i=0;i<size_x*size_y;i++){
 			matrix[i] = ' ';
 		}
-		printf("Generated successfully!\nWriting data to matrix.\n");
 		//Заполняем матрицу
 		rewind(pFile);//Скидываем дескриптор позиции файла на начало
 		x = 0;
@@ -133,7 +133,6 @@ public:
 				x++;
 			}
 		}while(sym!=EOF);
-		printf("Loaded!\n");
 		fclose(pFile);//Закрываем файл
 	}
 	void DrawMatrix(){
