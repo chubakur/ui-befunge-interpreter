@@ -64,6 +64,55 @@ private:
 			}
 			else if(command>='0' and command<='9') stack.push(command - '0');
 			else if(command=='"') symbol_mode = !symbol_mode;
+			else if(command=='+'){
+				int top = static_cast<int>(stack.top());
+				stack.pop();
+				int _top = static_cast<int>(stack.top());
+				stack.pop();
+				stack.push(static_cast<char>(top+_top));
+			}
+			else if(command=='-'){
+				int top = static_cast<int>(stack.top());
+				stack.pop();
+				int _top = static_cast<int>(stack.top());
+				stack.pop();
+				stack.push(static_cast<char>(top-_top));
+			}
+			else if(command=='*'){
+				int top = static_cast<int>(stack.top());
+				stack.pop();
+				int _top = static_cast<int>(stack.top());
+				stack.pop();
+				stack.push(static_cast<char>(top*_top));
+			}
+			else if(command=='/'){
+				int top = static_cast<int>(stack.top());
+				stack.pop();
+				int _top = static_cast<int>(stack.top());
+				stack.pop();
+				stack.push(static_cast<char>(top/_top));
+			}
+			else if(command=='%'){
+				int top = static_cast<int>(stack.top());
+				stack.pop();
+				int _top = static_cast<int>(stack.top());
+				stack.pop();
+				stack.push(static_cast<char>(top%_top));
+			}
+			else if(command=='&'){
+				int uservalue;
+				printf("Enter value:");
+				scanf("%d",&uservalue);
+				printf("\n");
+				stack.push(uservalue);
+			}
+			else if(command=='~'){
+				char uservalue;
+				printf("Enter character:");
+				scanf("%c",&uservalue);
+				printf("\n");
+				stack.push(uservalue);
+			}
 			else if(command==','){
 				printf("%c",stack.top());
 				stack.pop();
@@ -116,6 +165,7 @@ public:
 		}while(sym!=EOF);
 		size_x = max_x;
 		printf("Analyzing.\nSize of matrix: %dx%d\n",size_x,size_y);
+		size_x+=2;size_y+=2;
 		//Создаем матрицу
 		matrix = new char[size_x*size_y];
 		for(int i=0;i<size_x*size_y;i++){
@@ -154,7 +204,7 @@ public:
 		y = 0;
 		int direction;
 		while(true){
-//			printf("%d,%d - %c\n",x,y,matrix[x+y*size_x]);
+			//printf("%d,%d - %c\n",x,y,matrix[x+y*size_x]);
 			direction = Execute(x,y);
 			if(direction == 0) x--;
 			else if(direction == 1) x++;
@@ -167,7 +217,7 @@ public:
 	}
 };
 int main(){
-	const char* filename = "script.bfg";
+	const char* filename = "ss.bfg";
 	BefungeInterpreter interpreter;
 	interpreter.LoadScriptToRuntime(filename);
 	interpreter.DrawMatrix();
