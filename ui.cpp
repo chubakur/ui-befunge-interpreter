@@ -5,8 +5,9 @@
  *      Author: chubakur
  */
 #include "interpreter.h"
-int main(){
-	const char* filename = "sumxmul.bfg";
+int main(int argc, char** argv){
+	//const char* filename = "sumxmul.bfg";
+	const char* filename = *(argv+1);
 	BefungeInterpreter interpreter;
 	interpreter.LoadScriptToRuntime(filename);
 	//interpreter.DrawMatrix();
