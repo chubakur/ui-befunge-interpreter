@@ -204,6 +204,9 @@ public:
 		}while(sym!=EOF);
 		fclose(pFile);//Закрываем файл
 	}
+    char GetCharFromMatrix(int x,int y){
+        return matrix[y*size_x+x];
+    }
 	void DrawMatrix(){
 		printf("Matrix:\n[\n");
 		for(int y=0;y<size_y;y++){
