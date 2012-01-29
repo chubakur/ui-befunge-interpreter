@@ -1,39 +1,30 @@
-#include "GUInterpreter.h"
 #include <interpreter.h>
+#include <GUInterpreter.h>
 #include <stdio.h>
-GUIWidget::GUIWidget(){
-    scripttable = new QTableWidget(this);
-    console = new QTextEdit(this);
-    layout = new QHBoxLayout();
-    vlayout = new QVBoxLayout();
-    stackView = new QListWidget();
-    vlayout->addLayout(layout);
-    vlayout->addWidget(console);
-    layout->addWidget(scripttable);
-    layout->addWidget(stackView);
-    setLayout(vlayout);
-}
-GUIWidget::~GUIWidget(){
-    delete scripttable;
-    delete stackView;
-    delete layout;
-    for(int i=0;i<tableValues.size();i++) delete tableValues[i];
-}
 GUInterpreter::GUInterpreter(){
-    interpreter = new BefungeInterpreter();
     GUIEnvironment = new GUIWidget();
-    loadscriptAction = new QAction(tr("&Load Script"),this);
-    quitAction = new QAction(tr("&Quit"),this);
+    interpreter = new BefungeInterpreter(GUIEnvironment);
+    loadscriptAction = new QAction(tr("Load Script"),this);
+    quitAction = new QAction(tr("Quit"),this);
     runScriptAction = new QAction(tr("Run"), this);
+    startDebugAction = new QAction(tr("Start Debug"), this);
+    stopDebugAction = new QAction(tr("Stop Debug"), this);
+    stepAction = new QAction(tr("&Step Next"), this);
     connect(loadscriptAction,SIGNAL(triggered()),this,SLOT(loadscript()));
     connect(quitAction,SIGNAL(triggered()),qApp,SLOT(quit()));
     connect(runScriptAction, SIGNAL(triggered()),this,SLOT(runscript()));
-    menu = menuBar()->addMenu(tr("&Interpreter"));
+    connect(startDebugAction,SIGNAL(triggered()),this,SLOT(runscriptSbS()));
+    connect(stepAction,SIGNAL(triggered()),this,SLOT(step()));
+    connect(stopDebugAction,SIGNAL(triggered()),this,SLOT(stopDebug));
+    menu = menuBar()->addMenu(tr("Interpreter"));
     menu->addAction(loadscriptAction);
     menu->addSeparator();
     menu->addAction(quitAction);
-    menu_runtime = menuBar()->addMenu(tr("&Runtime"));
+    menu_runtime = menuBar()->addMenu(tr("Runtime"));
     menu_runtime->addAction(runScriptAction);
+    menu_debug = menuBar()->addMenu(tr("&Debug"));
+    menu_debug->addAction(startDebugAction);
+    menu_debug->addAction(stepAction);
     setCentralWidget(GUIEnvironment);
 }
 GUInterpreter::~GUInterpreter(){
@@ -59,13 +50,40 @@ void GUInterpreter::loadscript(){
             GUIEnvironment->tableValues<<item;//помещаем его в массив эл-тов.
             GUIEnvironment->scripttable->setItem(i,j,item);//добавляем в таблицу
             item->setText(QString(interpreter->GetCharFromMatrix(j,i)));//устанавливаем символ из матрицы интерпретатора
-            item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);//делаем его неизменяемым
+            item->setFlags(Qt::ItemIsEnabled);//делаем его неизменяемым
         }
     }
     GUIEnvironment->scripttable->resizeColumnsToContents();//подгоняем размеры
     GUIEnvironment->scripttable->resizeRowsToContents();
-    GUIEnvironment->tableValues[0]->setBackgroundColor(QColor(15,10,10,200));//выделяем 1-й эл-т таблицы
+    //GUIEnvironment->tableValues[0]->setBackgroundColor(QColor(193,155,232,200));//выделяем 1-й эл-т таблицы
+    //GUIEnvironment->tableValues[0]->setBackgroundColor(QColor(255,255,255,200));//выделяем 1-й эл-т таблицы
 }
 void GUInterpreter::runscript(){
     interpreter->Run();
+}
+void GUInterpreter::runscriptSbS(){
+    GUIEnvironment->print("Debug started.\n");
+    debug = true;
+    x = 0;
+    y = 0;
+    GUIEnvironment->tableValues[0]->setBackgroundColor(QColor(193,155,232,200));
+}
+void GUInterpreter::stopDebug(){
+    debug = false;
+    GUIEnvironment->tableValues[x+y*interpreter->size_x]->setBackgroundColor(QColor(255,255,255,200));
+}
+void GUInterpreter::step(){
+    if(!debug)
+        return;
+    GUIEnvironment->tableValues[x+y*interpreter->size_x]->setBackgroundColor(QColor(255,255,255,200));
+    direction = interpreter->Execute(x,y);
+    if(direction == 0) x--;
+    else if(direction == 1) x++;
+    else if(direction == 2) y--;
+    else if(direction == 3) y++;
+    else {
+        debug = false;
+        GUIEnvironment->print("Debug ended.\n");
+    }
+    GUIEnvironment->tableValues[x+y*interpreter->size_x]->setBackgroundColor(QColor(193,155,232,200));
 }
