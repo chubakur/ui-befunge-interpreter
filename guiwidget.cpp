@@ -21,17 +21,20 @@ GUIWidget::~GUIWidget(){
 }
 void GUIWidget::print(const char* sentence){
     console->setPlainText(console->toPlainText() + QString(sentence));
+    console->verticalScrollBar()->setValue(console->verticalScrollBar()->maximum());
 }
 void GUIWidget::print(char letter){
     console->setPlainText(console->toPlainText() + QString(letter));
+    console->verticalScrollBar()->setValue(console->verticalScrollBar()->maximum());
 }
 void GUIWidget::print(QString string){
     console->setPlainText(console->toPlainText() + string);
+    console->verticalScrollBar()->setValue(console->verticalScrollBar()->maximum());
 }
 void GUIWidget::push(char letter){
-    QListWidgetItem* item = new QListWidgetItem(QString(letter));
+    QListWidgetItem* item = new QListWidgetItem(QString(letter) + QString("     ")+QString::number(static_cast<int>(letter)));
     stackValues.push_back(item);
-    stackView->addItem(item);
+    stackView->insertItem(0,item);
 }
 void GUIWidget::pop(){
     QListWidgetItem* item = stackValues.back();

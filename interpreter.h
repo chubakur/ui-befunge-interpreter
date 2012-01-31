@@ -27,6 +27,7 @@ public:
     GUIWidget* guienvironment;
     BefungeInterpreter(){
         printf("Befunge interpreter. (c) chubakur@gmail.com 2012.\n");
+        symbol_mode = false;
         gui=false;
         matrix = NULL;
         srand(time(0));
@@ -35,6 +36,7 @@ public:
 	}
     BefungeInterpreter(GUIWidget* guienvironment){
         gui=true;
+        symbol_mode = false;
         this->guienvironment = guienvironment;
         this->guienvironment->print("Befunge interpreter. (c) chubakur@gmail.com 2012.\n");
         matrix = NULL;

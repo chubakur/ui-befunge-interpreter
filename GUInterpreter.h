@@ -12,7 +12,6 @@ private slots:
     void loadscript();
     void runscript();
     void runscriptSbS();//Step by Step
-    void stopDebug();
     void step();
 private:
     int x,y,direction;
@@ -21,7 +20,6 @@ private:
     QAction* quitAction;
     QAction* runScriptAction;
     QAction* startDebugAction;
-    QAction* stopDebugAction;
     QAction* stepAction;
     QMenu* menu;
     QMenu* menu_runtime;
