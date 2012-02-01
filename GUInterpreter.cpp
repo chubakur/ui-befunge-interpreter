@@ -3,6 +3,7 @@
 #include <stdio.h>
 GUInterpreter::GUInterpreter(){
     debug = false;
+    skipvoidsteps = true;
     GUIEnvironment = new GUIWidget();
     interpreter = new BefungeInterpreter(GUIEnvironment);
     loadscriptAction = new QAction(tr("Load Script"),this);
@@ -10,11 +11,15 @@ GUInterpreter::GUInterpreter(){
     runScriptAction = new QAction(tr("Run"), this);
     startDebugAction = new QAction(tr("Start debug"), this);;
     stepAction = new QAction(tr("&Step Next"), this);
+    traceAction = new QAction(tr("Trace"),this);
+    traceTimer = new QTimer(this);
     connect(loadscriptAction,SIGNAL(triggered()),this,SLOT(loadscript()));
     connect(quitAction,SIGNAL(triggered()),qApp,SLOT(quit()));
     connect(runScriptAction, SIGNAL(triggered()),this,SLOT(runscript()));
     connect(startDebugAction,SIGNAL(triggered()),this,SLOT(runscriptSbS()));
     connect(stepAction,SIGNAL(triggered()),this,SLOT(step()));
+    connect(traceAction,SIGNAL(triggered()),this,SLOT(trace()));
+    connect(traceTimer,SIGNAL(timeout()),this,SLOT(step()));
     menu = menuBar()->addMenu(tr("Interpreter"));
     menu->addAction(loadscriptAction);
     menu->addSeparator();
@@ -24,6 +29,7 @@ GUInterpreter::GUInterpreter(){
     menu_debug = menuBar()->addMenu(tr("&Debug"));
     menu_debug->addAction(startDebugAction);
     menu_debug->addAction(stepAction);
+    menu_debug->addAction(traceAction);
     setCentralWidget(GUIEnvironment);
 }
 GUInterpreter::~GUInterpreter(){
@@ -33,6 +39,8 @@ GUInterpreter::~GUInterpreter(){
     delete quitAction;
     delete startDebugAction;
     delete stepAction;
+    delete traceAction;
+    delete traceTimer;
     delete runScriptAction;
     delete GUIEnvironment;
 }
@@ -70,6 +78,7 @@ void GUInterpreter::runscriptSbS(){
         GUIEnvironment->print("Debug ended.\n");
     }
     debug = !debug;
+    skipvoidsteps = true;
     if(debug)
         GUIEnvironment->tableValues[0]->setBackgroundColor(QColor(193,155,232,200));
     else
@@ -91,8 +100,19 @@ void GUInterpreter::step(){
         debug = false;
         GUIEnvironment->print("\nDebug ended.\n");
         startDebugAction->setText("Start debug");
+        traceTimer->stop();
         return;
     }
     GUIEnvironment->tableValues[x+y*interpreter->size_x]->setBackgroundColor(QColor(193,155,232,200));
-    if(interpreter->GetCharFromMatrix(x,y) == ' ') step();
+    if(skipvoidsteps)
+        if(interpreter->GetCharFromMatrix(x,y) == ' ') step();
+}
+void GUInterpreter::trace(){
+    debug = true;
+    skipvoidsteps = false;
+    x = 0;
+    y = 0;
+    GUIEnvironment->print("Trace started\n");
+    traceTimer->start(400);
+    //GUIEnvironment->print("Trace ended\n");
 }

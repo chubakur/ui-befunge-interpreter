@@ -13,14 +13,18 @@ private slots:
     void runscript();
     void runscriptSbS();//Step by Step
     void step();
+    void trace();
 private:
     int x,y,direction;
     bool debug;
+    bool skipvoidsteps;
     QAction* loadscriptAction;
     QAction* quitAction;
     QAction* runScriptAction;
     QAction* startDebugAction;
     QAction* stepAction;
+    QAction* traceAction;
+    QTimer* traceTimer;
     QMenu* menu;
     QMenu* menu_runtime;
     QMenu* menu_debug;
